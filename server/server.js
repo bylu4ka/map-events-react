@@ -6,6 +6,7 @@ import http from "http";
 import { Server } from "socket.io";
 import eventRoutes from "./routes/events.js";
 import externalEventsRoutes from "./routes/externalEvents.js";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes(io));
 app.use("/api/external-events", externalEventsRoutes);
 

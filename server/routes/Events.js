@@ -1,5 +1,6 @@
 import express from "express";
 import Event from "../models/Event.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ export default function eventRoutes(io) {
     }
   });
 
-  router.post("/", async (req, res) => {
+  router.post("/", authMiddleware, async (req, res) => {
     try {
       const { title, description, category, lat, lng, eventDate } = req.body;
 
@@ -45,7 +46,7 @@ export default function eventRoutes(io) {
     }
   });
 
-  router.delete("/:id", async (req, res) => {
+  router.delete("/:id", authMiddleware, async (req, res) => {
     try {
       const deletedEvent = await Event.findByIdAndDelete(req.params.id);
 
