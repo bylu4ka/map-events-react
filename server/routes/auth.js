@@ -98,6 +98,78 @@ router.get("/verify-email", async (req, res) => {
   }
 });
 
+router.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Заповніть усі поля" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Пароль має містити мінімум 6 символів" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Користувач уже існує" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+    const user = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires,
+    });
+
+    try {
+      await sendVerificationEmail(user.email, verificationToken);
+
+      return res.status(201).json({
+        message: "Реєстрація успішна. Перевір пошту та підтвердь email.",
+      });
+    } catch (emailError) {
+      console.error("EMAIL SEND ERROR:", emailError);
+
+      return res.status(201).json({
+        message:
+          "Акаунт створено, але лист підтвердження не вдалося надіслати.",
+      });
+    }
+  } catch (error) {
+    console.error("REGISTER ERROR:", error);
+    return res.status(500).json({
+      message: "Помилка при реєстрації",
+      error: error.message,
+    });
+  }
+});
+
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "Користувача не знайдено" });
+    }
+
+    return res.json({ user });
+  } catch (error) {
+    return res.status(500).json({ message: "Помилка отримання профілю" });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -136,22 +208,13 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("LOGIN ERROR:", error);
     return res.status(500).json({ message: "Помилка при вході" });
   }
 });
 
-router.get("/me", authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ message: "Користувача не знайдено" });
-    }
-
-    return res.json({ user });
-  } catch (error) {
-    return res.status(500).json({ message: "Помилка отримання профілю" });
-  }
+router.get("/test", (req, res) => {
+  res.json({ message: "auth routes work" });
 });
 
 export default router;

@@ -19,13 +19,14 @@ export default function EventList({ events, onDelete }) {
               <p>
                 <strong>Дата:</strong> {event.eventDate}
               </p>
+
               {event.source === "ticketmaster" && (
                 <p>
                   <strong>Джерело:</strong> Ticketmaster
                 </p>
               )}
 
-              {event.source !== "ticketmaster" && (
+              {event.source !== "ticketmaster" && onDelete && (
                 <button
                   className="delete-btn"
                   onClick={() => onDelete(event._id)}

@@ -1,15 +1,23 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+dotenv.config();
 
 export async function sendVerificationEmail(to, token) {
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+  console.log("EMAIL_USER:", process.env.EMAIL_USER);
+  console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Є" : "Немає");
+  console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
+  console.log("CLIENT_URL:", process.env.CLIENT_URL);
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,

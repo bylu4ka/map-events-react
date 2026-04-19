@@ -140,3 +140,12 @@ button:hover {
 .delete-btn:hover {
   opacity: 0.9;
 }
+.success-text {
+  color: green;
+  margin-top: 10px;
+}
+
+.error-text {
+  color: red;
+  margin-top: 10px;
+}
