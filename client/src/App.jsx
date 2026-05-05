@@ -15,6 +15,7 @@ import {
   getExternalEvents,
   getMe,
   removeToken,
+  updateEvent,
   getToken,
 } from "./api/eventsApi";
 import "./App.css";
@@ -26,6 +27,8 @@ export default function App() {
   const [externalEvents, setExternalEvents] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentUser, setCurrentUser] = useState(null);
+
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   const path = window.location.pathname;
 
@@ -59,6 +62,28 @@ export default function App() {
     }
   };
 
+  const syncEventForCurrentFilter = (incomingEvent) => {
+    setEvents((prev) => {
+      const shouldShowEvent =
+        selectedCategory === "all" ||
+        incomingEvent.category === selectedCategory;
+
+      if (!shouldShowEvent) {
+        return prev.filter((event) => event._id !== incomingEvent._id);
+      }
+
+      const hasEvent = prev.some((event) => event._id === incomingEvent._id);
+
+      if (hasEvent) {
+        return prev.map((event) =>
+          event._id === incomingEvent._id ? incomingEvent : event,
+        );
+      }
+
+      return [incomingEvent, ...prev];
+    });
+  };
+
   const handleLoadExternalEvents = async (params) => {
     try {
       const data = await getExternalEvents(params);
@@ -82,22 +107,26 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    socket.on("new-event", (newEvent) => {
-      if (
-        selectedCategory === "all" ||
-        selectedCategory === newEvent.category
-      ) {
-        setEvents((prev) => [newEvent, ...prev]);
-      }
-    });
+    const handleNewEvent = (newEvent) => {
+      syncEventForCurrentFilter(newEvent);
+    };
 
-    socket.on("delete-event", (deletedId) => {
+    const handleDeletedEvent = (deletedId) => {
       setEvents((prev) => prev.filter((event) => event._id !== deletedId));
-    });
+    };
+
+    const handleUpdatedEvent = (updatedEvent) => {
+      syncEventForCurrentFilter(updatedEvent);
+    };
+
+    socket.on("new-event", handleNewEvent);
+    socket.on("delete-event", handleDeletedEvent);
+    socket.on("update-event", handleUpdatedEvent);
 
     return () => {
-      socket.off("new-event");
-      socket.off("delete-event");
+      socket.off("new-event", handleNewEvent);
+      socket.off("delete-event", handleDeletedEvent);
+      socket.off("update-event", handleUpdatedEvent);
     };
   }, [selectedCategory]);
 
@@ -119,7 +148,18 @@ export default function App() {
   if (path === "/verify-error") {
     return <VerifyError />;
   }
+  const handleUpdate = async (id, updatedData) => {
+    try {
+      const updatedEvent = await updateEvent(id, updatedData);
 
+      syncEventForCurrentFilter(updatedEvent);
+
+      return updatedEvent;
+    } catch (error) {
+      console.error("Помилка редагування події");
+      alert(error.response?.data?.message || "Не вдалося редагувати подію");
+    }
+  };
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -147,16 +187,26 @@ export default function App() {
 
         <ExternalEventsPanel onLoad={handleLoadExternalEvents} />
 
-        {currentUser && <EventForm />}
+        {currentUser && (
+          <EventForm
+            selectedLocation={selectedLocation}
+            onEventCreated={syncEventForCurrentFilter}
+          />
+        )}
 
         <EventList
           events={allEvents}
-          onDelete={currentUser ? handleDelete : null}
+          currentUser={currentUser}
+          onDelete={handleDelete}
+          onUpdate={handleUpdate}
         />
       </aside>
 
       <main className="content">
-        <EventMap events={allEvents} />
+        <EventMap
+          events={allEvents}
+          onSelectLocation={currentUser ? setSelectedLocation : null}
+        />
       </main>
     </div>
   );

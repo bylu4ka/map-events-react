@@ -48,6 +48,17 @@ export const getExternalEvents = async (params = {}) => {
   return response.data;
 };
 
+export const searchAddresses = async (query, limit = 5) => {
+  const response = await api.get("/geocode", {
+    params: {
+      q: query,
+      limit,
+    },
+  });
+
+  return response.data;
+};
+
 export const registerUser = async (userData) => {
   const response = await api.post("/auth/register", userData);
   return response.data;
@@ -62,6 +73,18 @@ export const getMe = async () => {
   const token = getToken();
 
   const response = await api.get("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const updateEvent = async (id, eventData) => {
+  const token = getToken();
+
+  const response = await api.put(`/events/${id}`, eventData, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

@@ -7,15 +7,24 @@ import { Server } from "socket.io";
 import eventRoutes from "./routes/events.js";
 import externalEventsRoutes from "./routes/externalEvents.js";
 import authRoutes from "./routes/auth.js";
+import geocodeRoutes from "./routes/geocode.js";
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(
+  (origin, index, origins) => origin && origins.indexOf(origin) === index,
+);
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "DELETE"],
   },
 });
@@ -26,6 +35,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes(io));
 app.use("/api/external-events", externalEventsRoutes);
+app.use("/api/geocode", geocodeRoutes);
 
 io.on("connection", (socket) => {
   console.log("Користувач підключився:", socket.id);

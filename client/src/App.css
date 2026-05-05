@@ -149,3 +149,42 @@ button:hover {
   color: red;
   margin-top: 10px;
 }
+.address-field {
+  position: relative;
+}
+
+.address-suggestions {
+  position: absolute;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  margin-top: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+}
+
+.address-suggestion {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  background-color: #1f6feb;
+  border-radius: 0;
+}
+
+.address-suggestion:hover {
+  background: #2fff00;
+}
+.event-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

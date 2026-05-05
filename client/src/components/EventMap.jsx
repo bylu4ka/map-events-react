@@ -1,55 +1,53 @@
 import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 
-delete L.Icon.Default.prototype._getIconUrl;
+function MapClickHandler({ onSelectLocation }) {
+  useMapEvents({
+    click(e) {
+      onSelectLocation({
+        lat: e.latlng.lat,
+        lng: e.latlng.lng,
+      });
+    },
+  });
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+  return null;
+}
 
-export default function EventMap({ events }) {
+export default function EventMap({ events, onSelectLocation }) {
   return (
-    <div className="map-wrapper">
-      <MapContainer center={[50.4501, 30.5234]} zoom={12} className="map">
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+    <MapContainer
+      center={[50.4501, 30.5234]}
+      zoom={12}
+      style={{ height: "100vh", width: "100%" }}
+    >
+      <TileLayer
+        attribution="&copy; OpenStreetMap contributors"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
 
-        {events.map((event) => (
-          <Marker key={event._id} position={[event.lat, event.lng]}>
-            <Popup>
-              <div>
-                <h4>{event.title}</h4>
-                <p>{event.description}</p>
-                <p>
-                  <strong>Категорія:</strong> {event.category}
-                </p>
-                <p>
-                  <strong>Дата:</strong> {event.eventDate}
-                </p>
-                {event.venueName && (
-                  <p>
-                    <strong>Локація:</strong> {event.venueName}
-                  </p>
-                )}
-                {event.url && (
-                  <p>
-                    <a href={event.url} target="_blank" rel="noreferrer">
-                      Відкрити джерело
-                    </a>
-                  </p>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-    </div>
+      {onSelectLocation && (
+        <MapClickHandler onSelectLocation={onSelectLocation} />
+      )}
+
+      {events.map((event) => (
+        <Marker key={event._id} position={[event.lat, event.lng]}>
+          <Popup>
+            <strong>{event.title}</strong>
+            <br />
+            {event.description}
+            <br />
+            {event.eventDate}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 }
