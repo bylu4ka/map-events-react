@@ -20,7 +20,10 @@ import {
 } from "./api/eventsApi";
 import "./App.css";
 
-const socket = io("http://localhost:5000");
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+
+const socket = io(SOCKET_URL);
 
 export default function App() {
   const [events, setEvents] = useState([]);

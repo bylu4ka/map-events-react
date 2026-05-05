@@ -22,14 +22,23 @@ const allowedOrigins = [
   (origin, index, origins) => origin && origins.indexOf(origin) === index,
 );
 
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "DELETE"],
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Not allowed by CORS"));
   },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+
+const io = new Server(server, {
+  cors: corsOptions,
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
