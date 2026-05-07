@@ -10,32 +10,47 @@ export async function sendVerificationEmail(to, token) {
   console.log("CLIENT_URL:", process.env.CLIENT_URL);
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    family: 4,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 
-  const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${token}`;
+  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject: "Підтвердження email",
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>Підтвердження email</h2>
-        <p>Дякуємо за реєстрацію у City Events Map.</p>
-        <p>Щоб завершити реєстрацію, натисни кнопку нижче:</p>
-        <p>
-          <a href="${verifyUrl}" style="display:inline-block;padding:10px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">
-            Підтвердити email
-          </a>
-        </p>
-        <p>Якщо кнопка не працює, відкрий це посилання вручну:</p>
-        <p>${verifyUrl}</p>
-      </div>
-    `,
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject: "Підтвердження email",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>Підтвердження email</h2>
+          <p>Дякуємо за реєстрацію у City Events Map.</p>
+
+          <p>
+            <a href="${verifyUrl}"
+              style="display:inline-block;padding:10px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">
+              Підтвердити email
+            </a>
+          </p>
+
+          <p>Якщо кнопка не працює:</p>
+          <p>${verifyUrl}</p>
+        </div>
+      `,
+    });
+
+    console.log("EMAIL SENT:", info.response);
+  } catch (error) {
+    console.error("EMAIL SEND ERROR:", error);
+    throw error;
+  }
 }

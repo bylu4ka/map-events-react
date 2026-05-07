@@ -14,22 +14,40 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+function parseOrigins(value) {
+  return value
+    ? value
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+    : [];
+}
+
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  ...parseOrigins(process.env.CLIENT_URL),
+  ...parseOrigins(process.env.CLIENT_URLS),
   "http://localhost:5173",
   "http://localhost:5174",
 ].filter(
   (origin, index, origins) => origin && origins.indexOf(origin) === index,
 );
 
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  const allowVercelPreviews =
+    process.env.ALLOW_VERCEL_PREVIEW_ORIGINS === "true";
+
+  return (
+    allowVercelPreviews &&
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)
+  );
+}
+
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error("Not allowed by CORS"));
+    callback(null, isAllowedOrigin(origin));
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
 };

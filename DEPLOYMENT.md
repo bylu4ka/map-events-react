@@ -24,6 +24,18 @@ Set `CLIENT_URL` to the deployed frontend URL, for example:
 CLIENT_URL=https://your-frontend.example.com
 ```
 
+If you want to allow several frontend domains, use `CLIENT_URLS`:
+
+```bash
+CLIENT_URLS=https://your-frontend.example.com,https://your-preview.vercel.app
+```
+
+For Vercel preview deployments you can also enable:
+
+```bash
+ALLOW_VERCEL_PREVIEW_ORIGINS=true
+```
+
 Use a hosted MongoDB connection string for `MONGO_URI`.
 
 ## Frontend
