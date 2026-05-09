@@ -26,6 +26,7 @@ function parseOrigins(value) {
 const allowedOrigins = [
   ...parseOrigins(process.env.CLIENT_URL),
   ...parseOrigins(process.env.CLIENT_URLS),
+  "https://map-events-react.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ].filter(
@@ -49,7 +50,8 @@ const corsOptions = {
   origin(origin, callback) {
     callback(null, isAllowedOrigin(origin));
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  optionsSuccessStatus: 204,
 };
 
 const io = new Server(server, {
@@ -57,6 +59,7 @@ const io = new Server(server, {
 });
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);

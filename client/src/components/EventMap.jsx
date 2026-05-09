@@ -8,6 +8,19 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
 function MapClickHandler({ onSelectLocation }) {
   useMapEvents({
     click(e) {
@@ -23,11 +36,7 @@ function MapClickHandler({ onSelectLocation }) {
 
 export default function EventMap({ events, onSelectLocation }) {
   return (
-    <MapContainer
-      center={[50.4501, 30.5234]}
-      zoom={12}
-      className="map"
-    >
+    <MapContainer center={[50.4501, 30.5234]} zoom={12} className="map">
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
