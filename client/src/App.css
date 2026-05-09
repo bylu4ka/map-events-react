@@ -2,13 +2,31 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --panel: #f8f9fb;
+  --border: #dde3ee;
+  --text: #172033;
+  --muted: #5f6b7a;
+  --primary: #1f6feb;
+  --danger: #d9534f;
+  --radius-lg: 16px;
+  --shadow-soft: 0 14px 40px rgba(23, 32, 51, 0.08);
+}
+
 html,
 body,
 #root {
   margin: 0;
   height: 100%;
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
+  font-family:
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
 body {
@@ -19,6 +37,9 @@ body {
   display: flex;
   height: 100vh;
   width: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(31, 111, 235, 0.08), transparent 32rem),
+    var(--bg);
 }
 
 .sidebar {
@@ -27,12 +48,13 @@ body {
   max-width: 380px;
   height: 100vh;
   padding: 20px;
-  background: #ffffff;
-  border-right: 1px solid #ddd;
+  background: rgba(255, 255, 255, 0.96);
+  border-right: 1px solid var(--border);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-shadow: var(--shadow-soft);
 }
 
 .content {
@@ -47,9 +69,9 @@ h1 {
 }
 
 .panel {
-  background: #f8f9fb;
-  border: 1px solid #ddd;
-  border-radius: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 16px;
 }
 
@@ -67,7 +89,8 @@ button {
   padding: 12px;
   font-size: 14px;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #cbd5e1;
+  color: var(--text);
 }
 
 textarea {
@@ -76,11 +99,12 @@ textarea {
 }
 
 button {
-  background: #1f6feb;
+  background: var(--primary);
   color: white;
   border: none;
   cursor: pointer;
   transition: 0.2s;
+  min-height: 44px;
 }
 
 button:hover {
@@ -114,9 +138,17 @@ button:hover {
 
 .event-card {
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
+}
+
+.event-card-image {
+  width: 100%;
+  max-height: 190px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
 .event-card h4 {
@@ -132,7 +164,7 @@ button:hover {
 
 .delete-btn {
   margin-top: 10px;
-  background: #d9534f;
+  background: var(--danger);
   color: white;
   border: none;
 }
@@ -162,7 +194,7 @@ button:hover {
   max-height: 180px;
   overflow-y: auto;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   margin-top: 4px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   border-radius: 10px;
@@ -173,18 +205,113 @@ button:hover {
   padding: 8px 10px;
   border: none;
   background: white;
+  color: var(--text);
   text-align: left;
   cursor: pointer;
   font-size: 13px;
-  background-color: #1f6feb;
   border-radius: 0;
 }
 
 .address-suggestion:hover {
-  background: #2fff00;
+  background: #edf4ff;
 }
 .event-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+@media (max-width: 1024px) {
+  body {
+    overflow: auto;
+  }
+
+  .layout {
+    min-height: 100dvh;
+    height: auto;
+    flex-direction: column;
+  }
+
+  .content {
+    order: 1;
+    flex: none;
+    width: 100%;
+    height: 52dvh;
+    min-height: 360px;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    order: 2;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    padding: 18px;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .event-list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .content {
+    height: 46dvh;
+    min-height: 300px;
+  }
+
+  .sidebar {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  h1 {
+    font-size: 22px;
+    line-height: 1.15;
+  }
+
+  .panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    min-height: 44px;
+    padding: 11px;
+    font-size: 16px;
+  }
+
+  .event-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .address-suggestions {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 420px) {
+  .content {
+    height: 42dvh;
+    min-height: 260px;
+  }
+
+  .event-card h4 {
+    font-size: 16px;
+  }
+
+  .event-card p {
+    font-size: 13px;
+  }
 }

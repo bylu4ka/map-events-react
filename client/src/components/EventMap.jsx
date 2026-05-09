@@ -26,7 +26,7 @@ export default function EventMap({ events, onSelectLocation }) {
     <MapContainer
       center={[50.4501, 30.5234]}
       zoom={12}
-      style={{ height: "100vh", width: "100%" }}
+      className="map"
     >
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
