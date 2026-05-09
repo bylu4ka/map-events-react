@@ -7,8 +7,6 @@ import EventList from "./components/EventList";
 import ExternalEventsPanel from "./components/ExternalEventsPanel";
 import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
-import VerifySuccess from "./components/VerifySuccess";
-import VerifyError from "./components/VerifyError";
 import {
   getEvents,
   deleteEvent,
@@ -31,8 +29,6 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   const [selectedLocation, setSelectedLocation] = useState(null);
-
-  const path = window.location.pathname;
 
   const loadEvents = async () => {
     try {
@@ -143,13 +139,6 @@ export default function App() {
     return [...events, ...filteredExternalEvents];
   }, [events, filteredExternalEvents]);
 
-  if (path === "/verify-success") {
-    return <VerifySuccess />;
-  }
-
-  if (path === "/verify-error") {
-    return <VerifyError />;
-  }
   const handleUpdate = async (id, updatedData) => {
     try {
       const updatedEvent = await updateEvent(id, updatedData);

@@ -71,4 +71,4 @@ VITE_SOCKET_URL=https://your-backend.example.com
 
 ## Important
 
-The old values from `server/.env` were committed before this cleanup. Treat those secrets as compromised and rotate them before using the production deployment.
+The old values from `server/.env` were committed before this cleanup. Treat those secrets as compromised and rotate them before using the production deployment. Email verification was removed, so email/Resend/Nodemailer credentials are no longer needed.
