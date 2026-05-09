@@ -1,56 +1,22 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export async function sendVerificationEmail(to, token) {
-  console.log("EMAIL_USER:", process.env.EMAIL_USER);
-  console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Є" : "Немає");
-  console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
-  console.log("CLIENT_URL:", process.env.CLIENT_URL);
+  const verifyUrl = `${process.env.SERVER_URL}/api/auth/verify-email?token=${token}`;
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    family: 4,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
+  await resend.emails.send({
+    from: "City Events Map <onboarding@resend.dev>",
+    to,
+    subject: "Підтвердження email",
+    html: `
+      <h2>Підтвердження email</h2>
+      <p>Дякуємо за реєстрацію у City Events Map.</p>
+      <a href="${verifyUrl}">Підтвердити email</a>
+      <p>${verifyUrl}</p>
+    `,
   });
-
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
-
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to,
-      subject: "Підтвердження email",
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2>Підтвердження email</h2>
-          <p>Дякуємо за реєстрацію у City Events Map.</p>
-
-          <p>
-            <a href="${verifyUrl}"
-              style="display:inline-block;padding:10px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">
-              Підтвердити email
-            </a>
-          </p>
-
-          <p>Якщо кнопка не працює:</p>
-          <p>${verifyUrl}</p>
-        </div>
-      `,
-    });
-
-    console.log("EMAIL SENT:", info.response);
-  } catch (error) {
-    console.error("EMAIL SEND ERROR:", error);
-    throw error;
-  }
 }
