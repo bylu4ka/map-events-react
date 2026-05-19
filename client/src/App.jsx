@@ -19,11 +19,16 @@ import {
 import "./App.css";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+const ENABLE_REALTIME = import.meta.env.VITE_ENABLE_REALTIME === "true";
 
-const socket = io(SOCKET_URL, {
-  transports: ["polling"],
-  upgrade: false,
-});
+const socket = ENABLE_REALTIME
+  ? io(SOCKET_URL, {
+      transports: ["polling"],
+      upgrade: false,
+      reconnectionAttempts: 2,
+      timeout: 5000,
+    })
+  : null;
 
 export default function App() {
   const [events, setEvents] = useState([]);
@@ -108,6 +113,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
     const handleNewEvent = (newEvent) => {
       syncEventForCurrentFilter(newEvent);
     };

@@ -67,7 +67,10 @@ Set these to the deployed backend URL:
 ```bash
 VITE_API_URL=https://your-backend.example.com/api
 VITE_SOCKET_URL=https://your-backend.example.com
+VITE_ENABLE_REALTIME=false
 ```
+
+Realtime Socket.IO is optional. Keep `VITE_ENABLE_REALTIME=false` on Render/Vercel if Socket.IO polling causes `502` or `400` noise in the browser console.
 
 ## Important
 
