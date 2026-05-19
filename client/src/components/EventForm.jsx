@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { createEvent, searchAddresses } from "../api/eventsApi";
 
+const ADDRESS_SEARCH_MIN_LENGTH = 5;
+const ADDRESS_SEARCH_DEBOUNCE_MS = 1800;
+
 export default function EventForm({ selectedLocation, onEventCreated }) {
   const [formData, setFormData] = useState({
     title: "",
@@ -39,7 +42,7 @@ export default function EventForm({ selectedLocation, onEventCreated }) {
       return;
     }
 
-    if (value.length < 3) {
+    if (value.length < ADDRESS_SEARCH_MIN_LENGTH) {
       setAddressSuggestions([]);
       return;
     }
@@ -52,7 +55,7 @@ export default function EventForm({ selectedLocation, onEventCreated }) {
         console.error("Помилка пошуку адреси", error);
         setAddressSuggestions([]);
       }
-    }, 1000);
+    }, ADDRESS_SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timeoutId);
   }, [formData.address, isAddressSearchEnabled]);
@@ -81,7 +84,10 @@ export default function EventForm({ selectedLocation, onEventCreated }) {
   };
 
   const findAddressCoordinates = async () => {
-    if (!formData.address.trim()) return;
+    if (formData.address.trim().length < ADDRESS_SEARCH_MIN_LENGTH) {
+      alert("Введіть щонайменше 5 символів адреси");
+      return;
+    }
 
     try {
       const data = await searchAddresses(formData.address, 1);

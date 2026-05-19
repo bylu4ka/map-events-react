@@ -20,7 +20,10 @@ import "./App.css";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
-const socket = io(SOCKET_URL);
+const socket = io(SOCKET_URL, {
+  transports: ["polling"],
+  upgrade: false,
+});
 
 export default function App() {
   const [events, setEvents] = useState([]);
