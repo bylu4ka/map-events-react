@@ -251,7 +251,7 @@ export default function EventForm({ selectedLocation, onEventCreated }) {
           value={formData.eventDate}
           onChange={handleChange}
         />
-        <input type="file" onChange={handleImage} />
+        {/* <input type="file" onChange={handleImage} /> */}
         <button type="submit">Додати</button>
       </form>
     </div>
